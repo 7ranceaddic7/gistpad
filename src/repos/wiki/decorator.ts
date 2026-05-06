@@ -128,21 +128,21 @@ export function registerLinkDecorator() {
     }
   });
 
+  let timeout: NodeJS.Timeout | null = null;
+  const triggerUpdateDecorations = (editor: TextEditor) => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => updateDecorations(editor), 1000);
+  };
+
   workspace.onDidChangeTextDocument((event) => {
     const editor = window.activeTextEditor;
-    if (!isWikiDocument(editor!.document)) {
+    if (!editor || !isWikiDocument(editor.document)) {
       return;
     }
 
-    let timeout: NodeJS.Timeout | null = null;
-    const triggerUpdateDecorations = (editor: TextEditor) => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      timeout = setTimeout(() => updateDecorations(editor), 1000);
-    };
-
-    if (editor !== undefined && event.document === editor.document) {
+    if (event.document === editor.document) {
       triggerUpdateDecorations(editor);
     }
   });
