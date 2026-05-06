@@ -138,28 +138,12 @@ async function attemptSilentSignin(refreshUI: boolean = true) {
 export async function initializeAuth() {
   authentication.onDidChangeSessions(async (e) => {
     if (e.provider.id === "github") {
-      // @ts-ignore
-      if (e.added.length > 0) {
-        // This session was added based on a GistPad-triggered
-        // sign-in, and so we don't need to do anything further to process it.
-        if (isSigningIn) {
-          isSigningIn = false;
-          return;
-        }
+      if (isSigningIn) {
+        isSigningIn = false;
+        return;
+      }
 
-        // The end-user just signed in to Gist via the
-        // VS Code account UI, and therefore, we need
-        // to grab the session token/etc.
-        await attemptSilentSignin();
-        // @ts-ignore
-      } else if (e.changed.length > 0 && e.changed.includes(loginSession)) {
-        // TODO: Validate when this actually fires
-        await attemptSilentSignin(false);
-      }
-      // @ts-ignore
-      else if (e.removed.length > 0 && e.removed.includes(loginSession)) {
-        // TODO: Implement sign out support
-      }
+      await attemptSilentSignin();
     }
   });
 
